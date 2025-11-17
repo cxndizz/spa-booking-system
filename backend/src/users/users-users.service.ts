@@ -64,7 +64,6 @@ export class UsersService {
       orderBy: { createdAt: 'desc' },
       include: {
         service: true,
-        staff: true,
         payments: true,
       },
     });
