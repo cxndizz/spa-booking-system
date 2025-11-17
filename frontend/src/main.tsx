@@ -11,6 +11,8 @@ import CssBaseline from '@mui/material/CssBaseline'
 
 import App from './App.tsx'
 import { theme } from './theme'
+import { AuthProvider } from './hooks/useAuth'
+import { LiffProvider } from './hooks/useLiff'
 import './index.css'
 
 // Create a client
@@ -31,7 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <HelmetProvider>
           <ThemeProvider theme={theme}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <SnackbarProvider 
+              <SnackbarProvider
                 maxSnack={3}
                 anchorOrigin={{
                   vertical: 'top',
@@ -40,7 +42,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 autoHideDuration={5000}
               >
                 <CssBaseline />
-                <App />
+                <AuthProvider>
+                  <LiffProvider>
+                    <App />
+                  </LiffProvider>
+                </AuthProvider>
               </SnackbarProvider>
             </LocalizationProvider>
           </ThemeProvider>
