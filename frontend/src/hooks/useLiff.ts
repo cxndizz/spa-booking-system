@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react'
+import { useState, useEffect, createContext, useContext, ReactNode, createElement } from 'react'
 
 // LIFF SDK types (simplified)
 declare global {
@@ -153,25 +153,21 @@ export function LiffProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  return (
-    <LiffContext.Provider
-      value={{
-        isLiff,
-        isLiffReady,
-        liffId,
-        lineUserId,
-        displayName,
-        pictureUrl,
-        isLoggedIn,
-        login,
-        logout,
-        closeWindow,
-        getProfile,
-      }}
-    >
-      {children}
-    </LiffContext.Provider>
-  )
+  const contextValue: LiffContextType = {
+    isLiff,
+    isLiffReady,
+    liffId,
+    lineUserId,
+    displayName,
+    pictureUrl,
+    isLoggedIn,
+    login,
+    logout,
+    closeWindow,
+    getProfile,
+  }
+
+  return createElement(LiffContext.Provider, { value: contextValue }, children)
 }
 
 export function useLiff() {
