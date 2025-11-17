@@ -390,7 +390,7 @@ export function createBookingsList(bookings: BookingWithService[]): FlexMessage 
     const statusText = getStatusText(booking.status);
     const serviceName = booking.serviceName || booking.service?.name || 'ไม่ระบุบริการ';
 
-    return {
+    const bubble: FlexBubble = {
       type: 'bubble',
       body: {
         type: 'box',
@@ -477,6 +477,7 @@ export function createBookingsList(bookings: BookingWithService[]): FlexMessage 
         ],
       },
     };
+    return bubble;
   });
 
   return {
