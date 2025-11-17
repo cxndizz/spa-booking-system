@@ -42,7 +42,7 @@ export class AuthService {
 
     await this.prisma.adminUser.update({
       where: { id: user.id },
-      data: { lastLogin: new Date() },
+      data: { lastLoginAt: new Date() },
     });
 
     return {
@@ -102,7 +102,7 @@ export class AuthService {
       data: {
         lineUserId: lineProfile.userId,
         displayName: lineProfile.displayName,
-        profilePictureUrl: lineProfile.pictureUrl,
+        pictureUrl: lineProfile.pictureUrl,
         isActive: true,
       },
     });
@@ -123,7 +123,7 @@ export class AuthService {
         id: user.id,
         lineUserId: user.lineUserId,
         displayName: user.displayName,
-        profilePictureUrl: user.profilePictureUrl,
+        pictureUrl: user.pictureUrl,
         phone: user.phone,
         email: user.email,
       },
@@ -140,7 +140,7 @@ export class AuthService {
         fullName: true,
         role: true,
         isActive: true,
-        lastLogin: true,
+        lastLoginAt: true,
         createdAt: true,
       },
     });
