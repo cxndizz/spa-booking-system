@@ -97,7 +97,6 @@ export class LineConversationService {
       where: { lineUserId },
       update: {
         ...data,
-        lastActiveAt: new Date(),
       },
       create: {
         lineUserId,
@@ -121,7 +120,6 @@ export class LineConversationService {
       data: {
         phone,
         email,
-        lastActiveAt: new Date(),
       },
     });
     this.clearState(lineUserId);
@@ -164,6 +162,8 @@ export class LineConversationService {
   async createBooking(data: {
     userId: string;
     serviceId: string;
+    serviceName: string;
+    servicePrice: number;
     appointmentDate: Date;
     appointmentTime: string;
     durationMinutes: number;
@@ -173,8 +173,16 @@ export class LineConversationService {
     const bookingNumber = await this.generateBookingNumber();
     return this.prisma.booking.create({
       data: {
-        ...data,
         bookingNumber,
+        userId: data.userId,
+        serviceId: data.serviceId,
+        serviceName: data.serviceName,
+        servicePrice: data.servicePrice,
+        appointmentDate: data.appointmentDate,
+        appointmentTime: data.appointmentTime,
+        durationMinutes: data.durationMinutes,
+        totalAmount: data.totalAmount,
+        customerNotes: data.customerNotes,
         status: 'PENDING',
         paymentStatus: 'PENDING',
       },
