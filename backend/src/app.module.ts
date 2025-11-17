@@ -11,6 +11,7 @@ import { StaffModule } from './staff/staff.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { LineModule } from './line/line.module';
 
 @Module({
   imports: [
@@ -19,10 +20,13 @@ import { WebhooksModule } from './webhooks/webhooks.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    
+
     // Database
     PrismaModule,
-    
+
+    // LINE Integration
+    LineModule,
+
     // Feature modules
     AuthModule,
     UsersModule,

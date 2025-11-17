@@ -1,7 +1,7 @@
 {
   "name": "spa-booking-frontend",
   "version": "1.0.0",
-  "description": "React Admin Panel + LIFF for Spa Booking System",
+  "description": "React Admin Panel for Spa Booking System",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -48,7 +48,7 @@
     "booking",
     "react",
     "admin-panel",
-    "line-liff"
+    "line-messaging-api"
   ],
   "author": "Your Team",
   "license": "MIT"
