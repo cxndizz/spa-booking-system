@@ -1,0 +1,313 @@
+// Prisma Schema for Spa Booking System
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MembershipLevel {
+  STANDARD
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum StaffPosition {
+  THERAPIST
+  CONSULTANT
+  MANAGER
+  ADMIN
+}
+
+enum ServiceCategory {
+  FACIAL
+  MASSAGE
+  BODY_TREATMENT
+  PACKAGE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  QR_CODE
+  BANK_TRANSFER
+  CASH
+  POINTS
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum AdminRole {
+  ADMIN
+  MANAGER
+  STAFF
+}
+
+enum LogAction {
+  CREATED
+  UPDATED
+  CANCELLED
+  COMPLETED
+  PAYMENT_UPDATED
+}
+
+// Main Tables
+model User {
+  id          String    @id @default(uuid())
+  lineUserId  String    @unique @map("line_user_id")
+  displayName String?   @map("display_name")
+  pictureUrl  String?   @map("picture_url")
+  phone       String?
+  email       String?
+  dateOfBirth DateTime? @map("date_of_birth")
+  gender      Gender?
+
+  // Membership info
+  membershipLevel MembershipLevel @default(STANDARD) @map("membership_level")
+  membershipSince DateTime        @default(now()) @map("membership_since")
+  totalSpent      Decimal         @default(0) @map("total_spent") @db.Decimal(10, 2)
+  pointsBalance   Int             @default(0) @map("points_balance")
+
+  // Status
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  bookings Booking[]
+
+  @@map("users")
+}
+
+model Staff {
+  id        String        @id @default(uuid())
+  staffCode String        @unique @map("staff_code")
+  name      String
+  nickname  String?
+  phone     String?
+  email     String?
+
+  // Work info
+  position     StaffPosition
+  specialties  Json?        // ["facial", "massage", "body_treatment"]
+  hourlyRate   Decimal?     @map("hourly_rate") @db.Decimal(8, 2)
+
+  // Schedule
+  workDays      Json?   @map("work_days") // ["monday", "tuesday", "wednesday"]
+  workStartTime String? @map("work_start_time") // "09:00"
+  workEndTime   String? @map("work_end_time")   // "18:00"
+
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("staff")
+}
+
+model Service {
+  id          String          @id @default(uuid())
+  serviceCode String          @unique @map("service_code")
+  name        String
+  description String?
+  category    ServiceCategory
+
+  // Pricing
+  price       Decimal  @db.Decimal(8, 2)
+  memberPrice Decimal? @map("member_price") @db.Decimal(8, 2)
+
+  // Duration & Capacity
+  durationMinutes   Int @map("duration_minutes")
+  maxParticipants   Int @default(1) @map("max_participants")
+
+  // Requirements
+  requiredStaffCount       Int  @default(1) @map("required_staff_count")
+  requiredStaffSpecialties Json? @map("required_staff_specialties") // ["facial"] or ["massage", "body_treatment"]
+
+  // Status
+  isActive   Boolean @default(true) @map("is_active")
+  isFeatured Boolean @default(false) @map("is_featured")
+  sortOrder  Int     @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  bookings Booking[]
+
+  @@map("services")
+}
+
+model Booking {
+  id            String  @id @default(uuid())
+  bookingNumber String  @unique @map("booking_number")
+
+  // Customer
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Service
+  serviceId    String  @map("service_id")
+  service      Service @relation(fields: [serviceId], references: [id])
+  serviceName  String  @map("service_name")  // เก็บไว้เผื่อ service เปลี่ยนชื่อ
+  servicePrice Decimal @map("service_price") @db.Decimal(8, 2) // ราคาตอนจอง
+
+  // Schedule
+  appointmentDate DateTime @map("appointment_date")
+  appointmentTime String   @map("appointment_time") // "14:30"
+  durationMinutes Int      @map("duration_minutes")
+
+  // Staff assignment
+  assignedStaffIds   Json? @map("assigned_staff_ids")   // ["staff-uuid-1", "staff-uuid-2"]
+  assignedStaffNames Json? @map("assigned_staff_names") // ["คุณแอน", "คุณบิว"]
+
+  // Status
+  status BookingStatus @default(PENDING)
+
+  // Payment
+  totalAmount   Decimal       @map("total_amount") @db.Decimal(8, 2)
+  paidAmount    Decimal       @default(0) @map("paid_amount") @db.Decimal(8, 2)
+  paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+
+  // Notes
+  customerNotes      String? @map("customer_notes")
+  staffNotes         String? @map("staff_notes")
+  cancellationReason String? @map("cancellation_reason")
+
+  // Tracking
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  payments    Payment[]
+  bookingLogs BookingLog[]
+
+  @@index([appointmentDate])
+  @@index([appointmentDate, appointmentTime])
+  @@index([userId, appointmentDate])
+  @@index([status])
+  @@map("bookings")
+}
+
+model Payment {
+  id        String @id @default(uuid())
+  bookingId String @map("booking_id")
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  // Omise integration
+  omiseChargeId       String? @map("omise_charge_id")
+  omiseTransactionId  String? @map("omise_transaction_id")
+
+  // Payment info
+  amount        Decimal       @db.Decimal(8, 2)
+  currency      String        @default("THB")
+  paymentMethod PaymentMethod @map("payment_method")
+
+  // Status tracking
+  status TransactionStatus @default(PENDING)
+
+  // Details
+  paidAt        DateTime? @map("paid_at")
+  receiptUrl    String?   @map("receipt_url")
+  failureReason String?   @map("failure_reason")
+
+  // Omise webhook data
+  omiseWebhookData Json? @map("omise_webhook_data")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([bookingId])
+  @@index([omiseChargeId])
+  @@index([status])
+  @@map("payments")
+}
+
+model AdminUser {
+  id           String    @id @default(uuid())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+
+  // Profile
+  fullName String?   @map("full_name")
+  role     AdminRole @default(STAFF)
+
+  // Permissions
+  permissions Json? // ["bookings.read", "bookings.write", "users.read"]
+
+  // Status
+  isActive    Boolean   @default(true) @map("is_active")
+  lastLoginAt DateTime? @map("last_login_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  updatedSettings BusinessSetting[]
+
+  @@map("admin_users")
+}
+
+model BusinessSetting {
+  key         String     @id
+  value       Json
+  description String?
+  updatedBy   String?    @map("updated_by")
+  updatedAt   DateTime   @default(now()) @updatedAt @map("updated_at")
+
+  // Relations
+  updater AdminUser? @relation(fields: [updatedBy], references: [id])
+
+  @@map("business_settings")
+}
+
+model BookingLog {
+  id        String    @id @default(uuid())
+  bookingId String    @map("booking_id")
+  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  action    LogAction
+
+  oldData   Json?
+  newData   Json?
+  changedBy String @map("changed_by") // 'system', 'admin:username', 'user:line_user_id'
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([bookingId, createdAt])
+  @@map("booking_logs")
+}

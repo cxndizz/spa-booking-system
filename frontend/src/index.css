@@ -1,0 +1,179 @@
+/* Global CSS for Spa Booking System */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Kanit', 'Roboto', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  background-color: #F8F9FA;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F1F1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C1C1C1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A1A1A1;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* Custom classes for specific components */
+.page-header {
+  margin-bottom: 24px;
+}
+
+.section-divider {
+  margin: 32px 0;
+  border: none;
+  border-top: 1px solid #E0E0E0;
+}
+
+/* LIFF specific styles */
+.liff-container {
+  padding: 16px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.liff-form {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Admin panel specific */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 280px;
+  background: #FFFFFF;
+  border-right: 1px solid #E0E0E0;
+  flex-shrink: 0;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 24px;
+  overflow-x: hidden;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .admin-content {
+    padding: 16px;
+  }
+  
+  .liff-container {
+    padding: 12px;
+  }
+  
+  .liff-form {
+    padding: 16px;
+  }
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility classes */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+/* Status indicators */
+.status-pending {
+  color: #FF9800;
+}
+
+.status-confirmed {
+  color: #4CAF50;
+}
+
+.status-cancelled {
+  color: #F44336;
+}
+
+.status-completed {
+  color: #2196F3;
+}
