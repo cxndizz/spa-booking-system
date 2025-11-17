@@ -3,8 +3,56 @@ import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+async function checkDatabaseConnection() {
+  try {
+    // ลองดึงข้อมูลจากตารางใดก็ได้เพื่อเช็คว่า schema ถูกสร้างแล้วหรือยัง
+    await prisma.$queryRaw`SELECT 1`;
+
+    // เช็คว่าตาราง admin_users มีอยู่หรือไม่
+    const tableExists = await prisma.$queryRaw`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_name = 'admin_users'
+      );
+    ` as Array<{ exists: boolean }>;
+
+    if (!tableExists[0]?.exists) {
+      console.error('❌ Database tables not found!');
+      console.error('');
+      console.error('📌 Please run migrations first:');
+      console.error('   npx prisma migrate dev --name init');
+      console.error('');
+      console.error('   Or if migrations already exist:');
+      console.error('   npx prisma migrate deploy');
+      console.error('');
+      process.exit(1);
+    }
+
+    return true;
+  } catch (error: any) {
+    if (error.code === 'P1001') {
+      console.error('❌ Cannot connect to database!');
+      console.error('   Please check your DATABASE_URL in .env file');
+    } else if (error.code === 'P2021') {
+      console.error('❌ Database tables not found!');
+      console.error('');
+      console.error('📌 Please run migrations first:');
+      console.error('   npx prisma migrate dev --name init');
+      console.error('');
+    } else {
+      throw error;
+    }
+    process.exit(1);
+  }
+}
+
 async function main() {
   console.log('🌱 Starting database seeding...');
+
+  // ตรวจสอบว่าฐานข้อมูลพร้อมใช้งานหรือยัง
+  await checkDatabaseConnection();
+  console.log('✅ Database connection verified');
 
   // 1. Create Default Admin User
   const adminPassword = process.env.ADMIN_DEFAULT_PASSWORD || 'admin123';
