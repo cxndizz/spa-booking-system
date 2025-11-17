@@ -1,8 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { LineClientService } from './line-client.service';
-import { RichMenuRequest } from '@line/bot-sdk';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Readable } from 'stream';
+
+// Define Rich Menu type inline since RichMenuRequest is not exported in v8
+interface RichMenuArea {
+  bounds: { x: number; y: number; width: number; height: number };
+  action: {
+    type: string;
+    label?: string;
+    data?: string;
+    displayText?: string;
+    text?: string;
+    uri?: string;
+  };
+}
+
+interface RichMenuSize {
+  width: number;
+  height: number;
+}
+
+interface RichMenuObject {
+  size: RichMenuSize;
+  selected: boolean;
+  name: string;
+  chatBarText: string;
+  areas: RichMenuArea[];
+}
 
 @Injectable()
 export class LineRichMenuService {
@@ -10,7 +36,7 @@ export class LineRichMenuService {
 
   // Create Rich Menu for registered users
   async createMainRichMenu(): Promise<string> {
-    const richMenu: RichMenuRequest = {
+    const richMenu: RichMenuObject = {
       size: {
         width: 2500,
         height: 1686,
@@ -92,7 +118,7 @@ export class LineRichMenuService {
 
   // Create Rich Menu for new/unregistered users
   async createGuestRichMenu(): Promise<string> {
-    const richMenu: RichMenuRequest = {
+    const richMenu: RichMenuObject = {
       size: {
         width: 2500,
         height: 1686,
@@ -179,10 +205,11 @@ export class LineRichMenuService {
   ): Promise<void> {
     try {
       const imageBuffer = fs.readFileSync(imagePath);
+      // Convert Buffer to Blob for LINE SDK v8+
+      const blob = new Blob([imageBuffer], { type: 'image/png' });
       await this.lineClient.getBlobClient().setRichMenuImage(
         richMenuId,
-        imageBuffer,
-        // Content-Type will be automatically detected
+        blob,
       );
       console.log('Uploaded Rich Menu image for:', richMenuId);
     } catch (error) {

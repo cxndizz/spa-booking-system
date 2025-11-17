@@ -184,7 +184,7 @@ export class LineEventHandlerService {
         break;
 
       case 'select_date':
-        const date = params.get('date') || event.postback.params?.date;
+        const date = params.get('date') || (event.postback.params as { date?: string })?.date;
         if (date) {
           await this.selectDateForBooking(userId, date, replyToken);
         }
@@ -551,6 +551,8 @@ export class LineEventHandlerService {
     const booking = await this.conversationService.createBooking({
       userId: user.id,
       serviceId: data.serviceId,
+      serviceName: service.name,
+      servicePrice: Number(service.price),
       appointmentDate: new Date(data.appointmentDate),
       appointmentTime: data.appointmentTime,
       durationMinutes: service.durationMinutes,
@@ -563,7 +565,7 @@ export class LineEventHandlerService {
     // Send confirmation
     const confirmationMessage = createBookingConfirmation({
       bookingNumber: booking.bookingNumber,
-      serviceName: booking.service.name,
+      serviceName: booking.serviceName,
       appointmentDate: moment(booking.appointmentDate).format('DD/MM/YYYY'),
       appointmentTime: booking.appointmentTime,
       durationMinutes: booking.durationMinutes,

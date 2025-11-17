@@ -327,7 +327,17 @@ export function createBookingConfirmation(booking: {
 }
 
 // User bookings list
-export function createBookingsList(bookings: any[]): FlexMessage {
+interface BookingWithService {
+  id: string;
+  bookingNumber: string;
+  serviceName: string;
+  appointmentDate: Date;
+  appointmentTime: string;
+  status: string;
+  service?: { name: string };
+}
+
+export function createBookingsList(bookings: BookingWithService[]): FlexMessage {
   if (bookings.length === 0) {
     return {
       type: 'flex',
@@ -378,6 +388,7 @@ export function createBookingsList(bookings: any[]): FlexMessage {
   const bubbles: FlexBubble[] = bookings.slice(0, 10).map((booking) => {
     const statusColor = getStatusColor(booking.status);
     const statusText = getStatusText(booking.status);
+    const serviceName = booking.serviceName || booking.service?.name || 'ไม่ระบุบริการ';
 
     return {
       type: 'bubble',
@@ -387,7 +398,7 @@ export function createBookingsList(bookings: any[]): FlexMessage {
         contents: [
           {
             type: 'text',
-            text: booking.service.name,
+            text: serviceName,
             weight: 'bold',
             size: 'md',
             wrap: true,
