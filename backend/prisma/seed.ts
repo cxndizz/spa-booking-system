@@ -12,7 +12,9 @@ async function main() {
 
   const defaultAdmin = await prisma.adminUser.upsert({
     where: { email: 'admin@spa.com' },
-    update: {},
+    update: {
+      passwordHash: hashedPassword,  // Always update password to match .env configuration
+    },
     create: {
       username: 'admin',
       email: 'admin@spa.com',
