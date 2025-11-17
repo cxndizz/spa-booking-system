@@ -18,7 +18,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:generate": "prisma migrate dev",
     "migration:deploy": "prisma migrate deploy",
-    "db:seed": "ts-node prisma/seed.ts"
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:reset-admin": "psql $DATABASE_URL -f prisma/reset-admin-password.sql"
   },
   "dependencies": {
     "@nestjs/common": "^10.2.8",
