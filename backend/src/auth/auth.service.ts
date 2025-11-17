@@ -10,9 +10,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateAdmin(username: string, password: string): Promise<any> {
+  async validateAdmin(email: string, password: string): Promise<any> {
     const admin = await this.prisma.adminUser.findUnique({
-      where: { username },
+      where: { email },
     });
 
     if (!admin) {
