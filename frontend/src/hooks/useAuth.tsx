@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Verify token with backend
-      const response = await fetch('/api/v1/auth/verify', {
+      const response = await fetch('/api/v1/auth/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

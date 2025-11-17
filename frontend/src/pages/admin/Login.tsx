@@ -47,7 +47,7 @@ function AdminLogin() {
       }
 
       const result = await response.json()
-      login(result.data.token)
+      login(result.data.access_token)
       navigate('/admin/dashboard')
     } catch (err) {
       setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
